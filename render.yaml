@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: desi-gpt
+    env: python
+    buildCommand: ""
+    startCommand: python app.py
+    envVars:
+      - key: GROQ_API_KEY
+        value: sk-xxxxxxxxxxxx
