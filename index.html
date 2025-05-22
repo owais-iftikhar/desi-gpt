@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Desi GPT – Urdu AI Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Desi GPT – Urdu + Java Programming Assistant 🇵🇰</h2>
+
+    <!-- Feature Buttons -->
+    <div class="top-buttons">
+        <button onclick="toggleDarkMode()" id="darkBtn">🌙 Toggle Dark Mode</button>
+        <button onclick="showHistory()">📜 Show Chat History</button>
+    </div>
+
+    <!-- Input Form -->
+    <form method="post">
+        <input type="text" name="question" placeholder="Apna sawal likhein..." required>
+        <button type="submit">Poochein</button>
+        <button type="button" onclick="startListening()">🎙️ Speak</button>
+
+    </form>
+
+    <!-- Quick Questions -->
+    <div class="quick-buttons">
+        <form method="post">
+            <button type="submit" name="question" value="Loop kya hota hai?">Loop</button>
+            <button type="submit" name="question" value="Array kya hota hai Java mein?">Array</button>
+            <button type="submit" name="question" value="Recursion ko Roman Urdu mein samjhao">Recursion</button>
+            <button type="submit" name="question" value="HashMap kya hoti hai Java mein?">HashMap</button>
+        </form>
+    </div>
+
+    <!-- Chat Output -->
+    {% if reply %}
+    <div class="chat-container">
+        <div class="chat-avatar">🤖</div>
+        <div class="chat-bubble">
+            <h3>Desi GPT:</h3>
+            <div id="chat-reply">{{ reply | safe }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- History Output -->
+    <div id="history-box"></div>
+
+    <!-- Dark Mode & History Scripts -->
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+
+        function showHistory() {
+            const box = document.getElementById("history-box");
+            const history = JSON.parse(localStorage.getItem("chatHistory")) || [];
+            box.innerHTML = "<h3>Previous Questions:</h3>";
+            history.slice(-5).reverse().forEach((item, i) => {
+                box.innerHTML += `<div class="history-item">
+                    <b>Q:</b> ${item.q}<br>
+                    <b>A:</b> ${item.a}
+                </div>`;
+            });
+        }
+
+        const replyBox = document.getElementById('chat-reply');
+        const questionInput = document.querySelector('input[name="question"]');
+        if (replyBox && questionInput && questionInput.value) {
+            let history = JSON.parse(localStorage.getItem("chatHistory")) || [];
+            history.push({ q: questionInput.value, a: replyBox.innerHTML });
+            localStorage.setItem("chatHistory", JSON.stringify(history));
+        }
+    </script>
+    <script>
+function startListening() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Speech recognition not supported");
+        return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = "en-US"; // or "ur-PK" for Urdu
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.querySelector('input[name="question"]').value = transcript;
+    };
+
+    recognition.start();
+}
+</script>
+
+</body>
+</html>
